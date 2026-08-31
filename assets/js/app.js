@@ -13,27 +13,7 @@
   var saved = readTheme();
   if (saved === 'light') root.setAttribute('data-theme', 'light');
 
-  var themeBtn = document.querySelector('[data-action="theme"]');
-  if (themeBtn) {
-    themeBtn.addEventListener('click', function () {
-      var light = root.getAttribute('data-theme') === 'light';
-      if (light) { root.removeAttribute('data-theme'); writeTheme('dark'); }
-      else { root.setAttribute('data-theme', 'light'); writeTheme('light'); }
-      themeBtn.setAttribute('aria-pressed', String(!light));
-    });
-  }
-
-  /* --- Menu mobile --- */
-  var menuBtn = document.querySelector('[data-action="menu"]');
-  var nav = document.getElementById('nav');
-  if (menuBtn && nav) {
-    menuBtn.addEventListener('click', function () {
-      var open = nav.classList.toggle('open');
-      menuBtn.setAttribute('aria-expanded', String(open));
-    });
-  }
-
-  /* --- Compte à rebours --- */
+  /* --- Compte à rebours (Initialisation statique) --- */
   var cd = document.querySelector('[data-countdown]');
   if (cd) {
     var target = new Date(cd.getAttribute('data-countdown') + 'T09:00:00+02:00');
@@ -57,91 +37,81 @@
     setInterval(tick, 1000);
   }
 
-  /* --- Filtres de liste (mesures, sources, acteurs) --- */
-  var list = document.querySelector('[data-filterable]');
-  if (list) {
+  /* --- Logique de filtrage dynamique --- */
+  function norm(s) {
+    return (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+
+  function applyFilters() {
+    var list = document.querySelector('[data-filterable]');
+    if (!list) return; // Ignore si la page ne contient pas de liste
+    
+    // Scan en temps réel des éléments et de l'état des filtres
+    var items = Array.prototype.slice.call(list.querySelectorAll('[data-item]'));
     var search = document.querySelector('[data-filter="q"]');
     var selects = Array.prototype.slice.call(document.querySelectorAll('select[data-filter]'));
-    var chips = Array.prototype.slice.call(document.querySelectorAll('.chip[data-filter-statut]'));
-    var counter = document.querySelector('[data-count]');
-    var empty = document.querySelector('[data-empty]');
-    var active = new Set();
+    var activeChips = Array.prototype.slice.call(document.querySelectorAll('.chip[data-filter-statut][aria-pressed="true"]'));
+    
+    var q = norm(search ? search.value : '');
+    var sel = {};
+    selects.forEach(function (s) { if (s.value) sel[s.getAttribute('data-filter')] = s.value; });
+    
+    var activeStatus = new Set();
+    activeChips.forEach(function(c) { activeStatus.add(c.getAttribute('data-filter-statut')); });
 
-    function norm(s) {
-      return (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    }
-
-    function apply() {
-      // 1. Récupération dynamique (utile si le HTML final est généré asynchrone)
-      var currentItems = Array.prototype.slice.call(list.querySelectorAll('[data-item]'));
+    var shown = 0;
+    
+    items.forEach(function (el) {
+      var ok = true;
       
-      var q = norm(search ? search.value : '');
-      var sel = {};
-      selects.forEach(function (s) { if (s.value) sel[s.getAttribute('data-filter')] = s.value; });
-      var shown = 0;
+      // Vérification Statut
+      if (activeStatus.size && !activeStatus.has(el.getAttribute('data-statut'))) ok = false;
       
-      currentItems.forEach(function (el) {
-        var ok = true;
-        if (active.size && !active.has(el.getAttribute('data-statut'))) ok = false;
-        for (var k in sel) {
-          if (ok && (el.getAttribute('data-' + k) || '').split(' ').indexOf(sel[k]) === -1) ok = false;
-        }
-        
-        // 2. Prévention des erreurs si l'attribut data-search est vide
-        var dataSearch = el.getAttribute('data-search') || '';
-        if (ok && q && norm(dataSearch).indexOf(q) === -1) ok = false;
-        
-        // 3. Forçage CSS Inline : la seule façon de garantir le masquage face à "display: flex"
-        el.style.display = ok ? '' : 'none';
-        el.hidden = !ok; // Conservé pour l'accessibilité
-        
-        if (ok) shown++;
-      });
-      
-      if (counter) counter.textContent = shown + (shown > 1 ? ' entrées' : ' entrée');
-      if (empty) {
-        empty.style.display = (shown === 0 && currentItems.length > 0) ? '' : 'none';
-        empty.hidden = (shown !== 0);
+      // Vérification Catégories (Selects)
+      for (var k in sel) {
+        if (ok && (el.getAttribute('data-' + k) || '').split(' ').indexOf(sel[k]) === -1) ok = false;
       }
       
-      try {
-        var p = new URLSearchParams();
-        if (q) p.set('q', search.value);
-        if (active.size) p.set('statut', Array.from(active).join(','));
-        for (var k2 in sel) p.set(k2, sel[k2]);
-        var s = p.toString();
-        history.replaceState(null, '', s ? '?' + s : location.pathname);
-      } catch (e) { /* ignore */ }
-    }
-
-    chips.forEach(function (c) {
-      c.addEventListener('click', function () {
-        var v = c.getAttribute('data-filter-statut');
-        if (active.has(v)) { active.delete(v); c.setAttribute('aria-pressed', 'false'); }
-        else { active.add(v); c.setAttribute('aria-pressed', 'true'); }
-        apply();
-      });
+      // Vérification Texte
+      var dataSearch = el.getAttribute('data-search') || '';
+      if (ok && q && norm(dataSearch).indexOf(q) === -1) ok = false;
+      
+      // Forçage de l'affichage / masquage
+      el.style.display = ok ? '' : 'none';
+      if (ok) shown++;
     });
     
-    if (search) search.addEventListener('input', apply);
-    selects.forEach(function (s) { s.addEventListener('change', apply); });
+    // Mise à jour de l'interface
+    var counter = document.querySelector('[data-count]');
+    if (counter) counter.textContent = shown + (shown > 1 ? ' entrées' : ' entrée');
+    
+    var empty = document.querySelector('[data-empty]');
+    if (empty) empty.style.display = (shown === 0 && items.length > 0) ? '' : 'none';
 
-    var reset = document.querySelector('[data-action="reset"]');
-    if (reset) reset.addEventListener('click', function () {
-      if (search) search.value = '';
-      selects.forEach(function (s) { s.value = ''; });
-      active.clear();
-      chips.forEach(function (c) { c.setAttribute('aria-pressed', 'false'); });
-      apply();
-    });
+    // Synchronisation URL
+    try {
+      var p = new URLSearchParams();
+      if (q) p.set('q', search.value);
+      if (activeStatus.size) p.set('statut', Array.from(activeStatus).join(','));
+      for (var k2 in sel) p.set(k2, sel[k2]);
+      var s = p.toString();
+      history.replaceState(null, '', s ? '?' + s : location.pathname);
+    } catch (e) { /* ignore */ }
+  }
 
-    /* Pré-remplissage depuis l'URL */
+  // Pré-remplissage initial sécurisé (attente de l'injection DOM)
+  var urlApplied = false;
+  function applyUrlParams() {
+    if (urlApplied) return;
+    var search = document.querySelector('[data-filter="q"]');
+    var selects = document.querySelectorAll('select[data-filter]');
+    if (!search && selects.length === 0) return; // Filtres pas encore injectés
+    
     try {
       var params = new URLSearchParams(location.search);
       if (params.get('q') && search) search.value = params.get('q');
       if (params.get('statut')) {
         params.get('statut').split(',').forEach(function (v) {
-          active.add(v);
           var c = document.querySelector('.chip[data-filter-statut="' + v + '"]');
           if (c) c.setAttribute('aria-pressed', 'true');
         });
@@ -150,15 +120,76 @@
         var v = params.get(s.getAttribute('data-filter'));
         if (v) s.value = v;
       });
-    } catch (e) { /* ignore */ }
+    } catch (e) {}
     
-    apply();
-
-    // 4. MutationObserver correctement isolé pour intercepter l'injection tardive de données
-    var observer = new MutationObserver(function(mutations) {
-        var hasNewNodes = mutations.some(function(m) { return m.addedNodes.length > 0; });
-        if (hasNewNodes) apply(); 
-    });
-    observer.observe(list, { childList: true, subtree: true });
+    urlApplied = true;
+    applyFilters();
   }
+
+  /* --- Délégation Globale des Événements --- */
+  
+  // Écoute des champs texte
+  document.addEventListener('input', function(e) {
+    if (e.target && e.target.matches && e.target.matches('[data-filter="q"]')) applyFilters();
+  });
+
+  // Écoute des listes déroulantes
+  document.addEventListener('change', function(e) {
+    if (e.target && e.target.matches && e.target.matches('select[data-filter]')) applyFilters();
+  });
+
+  // Écoute des boutons (Thème, Menu, Chips, Reset)
+  document.addEventListener('click', function(e) {
+    // 1. Bouton Thème
+    var themeBtn = e.target.closest('[data-action="theme"]');
+    if (themeBtn) {
+      var light = root.getAttribute('data-theme') === 'light';
+      if (light) { root.removeAttribute('data-theme'); writeTheme('dark'); }
+      else { root.setAttribute('data-theme', 'light'); writeTheme('light'); }
+      themeBtn.setAttribute('aria-pressed', String(!light));
+      return;
+    }
+
+    // 2. Bouton Menu Mobile
+    var menuBtn = e.target.closest('[data-action="menu"]');
+    if (menuBtn) {
+      var nav = document.getElementById('nav');
+      if (nav) {
+        var open = nav.classList.toggle('open');
+        menuBtn.setAttribute('aria-expanded', String(open));
+      }
+      return;
+    }
+
+    // 3. Boutons Filtres (Chips)
+    var chip = e.target.closest('.chip[data-filter-statut]');
+    if (chip) {
+      var pressed = chip.getAttribute('aria-pressed') === 'true';
+      chip.setAttribute('aria-pressed', String(!pressed));
+      applyFilters();
+      return;
+    }
+    
+    // 4. Bouton Réinitialiser
+    var reset = e.target.closest('[data-action="reset"]');
+    if (reset) {
+      var search = document.querySelector('[data-filter="q"]');
+      if (search) search.value = '';
+      document.querySelectorAll('select[data-filter]').forEach(function(s) { s.value = ''; });
+      document.querySelectorAll('.chip[data-filter-statut]').forEach(function(c) { c.setAttribute('aria-pressed', 'false'); });
+      applyFilters();
+    }
+  });
+
+  /* --- Surveillance continue des injections JSON --- */
+  var observer = new MutationObserver(function() {
+    applyUrlParams(); // Remplit l'URL dès que les filtres apparaissent
+    applyFilters();   // Tri dès que les cartes JSON apparaissent
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+
+  // Exécution manuelle au lancement au cas où le DOM est déjà prêt
+  applyUrlParams();
+  applyFilters();
+
 })();
