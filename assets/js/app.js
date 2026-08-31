@@ -60,7 +60,6 @@
   /* --- Filtres de liste (mesures, sources, acteurs) --- */
   var list = document.querySelector('[data-filterable]');
   if (list) {
-    var items = Array.prototype.slice.call(list.querySelectorAll('[data-item]'));
     var search = document.querySelector('[data-filter="q"]');
     var selects = Array.prototype.slice.call(document.querySelectorAll('select[data-filter]'));
     var chips = Array.prototype.slice.call(document.querySelectorAll('.chip[data-filter-statut]'));
@@ -73,22 +72,38 @@
     }
 
     function apply() {
+      // 1. Récupération dynamique (utile si le HTML final est généré asynchrone)
+      var currentItems = Array.prototype.slice.call(list.querySelectorAll('[data-item]'));
+      
       var q = norm(search ? search.value : '');
       var sel = {};
       selects.forEach(function (s) { if (s.value) sel[s.getAttribute('data-filter')] = s.value; });
       var shown = 0;
-      items.forEach(function (el) {
+      
+      currentItems.forEach(function (el) {
         var ok = true;
         if (active.size && !active.has(el.getAttribute('data-statut'))) ok = false;
         for (var k in sel) {
           if (ok && (el.getAttribute('data-' + k) || '').split(' ').indexOf(sel[k]) === -1) ok = false;
         }
-        if (ok && q && norm(el.getAttribute('data-search')).indexOf(q) === -1) ok = false;
-        el.hidden = !ok;
+        
+        // 2. Prévention des erreurs si l'attribut data-search est vide
+        var dataSearch = el.getAttribute('data-search') || '';
+        if (ok && q && norm(dataSearch).indexOf(q) === -1) ok = false;
+        
+        // 3. Forçage CSS Inline : la seule façon de garantir le masquage face à "display: flex"
+        el.style.display = ok ? '' : 'none';
+        el.hidden = !ok; // Conservé pour l'accessibilité
+        
         if (ok) shown++;
       });
+      
       if (counter) counter.textContent = shown + (shown > 1 ? ' entrées' : ' entrée');
-      if (empty) empty.hidden = shown !== 0;
+      if (empty) {
+        empty.style.display = (shown === 0 && currentItems.length > 0) ? '' : 'none';
+        empty.hidden = (shown !== 0);
+      }
+      
       try {
         var p = new URLSearchParams();
         if (q) p.set('q', search.value);
@@ -107,6 +122,7 @@
         apply();
       });
     });
+    
     if (search) search.addEventListener('input', apply);
     selects.forEach(function (s) { s.addEventListener('change', apply); });
 
@@ -135,6 +151,14 @@
         if (v) s.value = v;
       });
     } catch (e) { /* ignore */ }
+    
     apply();
+
+    // 4. MutationObserver correctement isolé pour intercepter l'injection tardive de données
+    var observer = new MutationObserver(function(mutations) {
+        var hasNewNodes = mutations.some(function(m) { return m.addedNodes.length > 0; });
+        if (hasNewNodes) apply(); 
+    });
+    observer.observe(list, { childList: true, subtree: true });
   }
 })();
