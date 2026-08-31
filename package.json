@@ -1,0 +1,14 @@
+{
+  "name": "conclave-arizona",
+  "version": "1.0.0",
+  "description": "Tracker indépendant du conclave budgétaire fédéral belge 2026 et du budget 2027.",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "build": "node tools/build.js",
+    "check": "node tools/check.js",
+    "serve": "python3 -m http.server 8000",
+    "dev": "node tools/build.js && node tools/check.js && python3 -m http.server 8000"
+  },
+  "engines": { "node": ">=18" }
+}

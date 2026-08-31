@@ -1,0 +1,112 @@
+{
+  "nom": "Conclave Arizona",
+  "titre": "Conclave Arizona — le budget fédéral belge 2027 en temps réel",
+  "baseline": "Suivi du conclave budgétaire fédéral belge de l'automne 2026. Ce qui est décidé, ce qui est proposé, ce qui n'est pas vérifié.",
+  "description": "Tracker indépendant du conclave budgétaire fédéral belge de l'automne 2026 et du budget 2027 : fiches mesures avec statut et sources, graphe de connaissance, chronologie, douze angles morts et cadre de chiffrage. Arrêté au 31 août 2026.",
+  "url": "https://ouaisfieu.github.io/conclave-arizona/",
+  "repo": "https://github.com/ouaisfieu/conclave-arizona",
+  "lien_usba": "https://dl.ouaisfi.eu/usba/",
+  "arrete": "2026-08-31",
+  "conclave_date": "2026-09-21",
+  "echeance_politique": "2026-10-13",
+  "depot_legal": "2026-10-15",
+  "langue": "fr-BE",
+  "auteur": "Claude (Anthropic)",
+  "editeur": "Publication indépendante et anonyme",
+  "licence": "CC BY 4.0 pour les textes, MIT pour le code",
+  "chiffres_cles": [
+    {"valeur":"10 Md€","label":"cible politique complémentaire d'ici 2029","statut":"engagement","lien":"cible-10-milliards"},
+    {"valeur":"7,7 Md€","label":"écart cumulé à la norme de dépense de l'Entité I","statut":"base","lien":"chiffre-77"},
+    {"valeur":"5,1–5,5 %","label":"fourchette officielle du déficit public en 2027","statut":"base","lien":"chiffre-deficit-2027"},
+    {"valeur":"≈112 %","label":"dette publique projetée en 2027","statut":"base","lien":"chiffre-dette"}
+  ],
+  "montants_a_ne_pas_confondre": [
+    {"chiffre":"7,7 Md€","nature":"Écart cumulé à la norme de dépense nette — Entité I — 2029","piege":"Ce n'est pas le déficit annuel."},
+    {"chiffre":"10 Md€","nature":"Cible politique complémentaire à l'horizon 2029","piege":"Ce n'est pas une coupe unique en 2027."},
+    {"chiffre":"30,344 Md€","nature":"Déficit de l'Entité I projeté en 2027 à politique inchangée","piege":"Il ne baisse pas mécaniquement de 10 Md€ en 2027."},
+    {"chiffre":"≈122 % du PIB","nature":"Stock de dette publique projeté en 2031","piege":"Ce n'est pas une économie annuelle à trouver."}
+  ],
+  "statuts": [
+    {"cle":"base","label":"En vigueur / dans la base","definition":"Droit existant ou décision déjà intégrée aux estimations à politique inchangée.","couleur":"#7fd1a8"},
+    {"cle":"decide","label":"Décidé, exécution en cours","definition":"Une base légale ou un accord existe, mais le rendement effectif reste incertain.","couleur":"#9fe8a8"},
+    {"cle":"engagement","label":"Engagement politique","definition":"Objectif annoncé sans ventilation suffisante entre années, mesures et niveaux de pouvoir.","couleur":"#c3b3f5"},
+    {"cle":"option","label":"Option chiffrée","definition":"Simulation technique ou proposition d'une administration, d'un parti ou d'un acteur externe. Aucune décision.","couleur":"#8fb4ff"},
+    {"cle":"non-verifie","label":"Non vérifié / anachronique","definition":"Source primaire absente, référence circulaire, ou événement postérieur à la date d'arrêté.","couleur":"#ff9f9f"}
+  ],
+  "regles_anti_double_comptage": [
+    "Ne jamais additionner un stock annuel et un cumul pluriannuel.",
+    "Retrancher les mesures déjà intégrées dans le scénario à politique inchangée.",
+    "Distinguer solde fédéral, solde consolidé et métrique européenne des dépenses nettes.",
+    "Séparer effet de caisse, effet SEC et effet structurel.",
+    "Ne compter qu'une fois les mesures qui se chevauchent.",
+    "Appliquer un rendement partiel l'année d'entrée en vigueur.",
+    "Enregistrer les compensations et les coûts administratifs.",
+    "Présenter séparément les recettes exceptionnelles et récurrentes."
+  ],
+  "fiche_mesure_champs": [
+    {"champ":"Statut","contenu":"En vigueur, décidé, engagement, option ou non vérifié"},
+    {"champ":"Autorité","contenu":"Niveau de pouvoir, ministre, administration et opérateur"},
+    {"champ":"Base juridique","contenu":"Texte à modifier, calendrier et risque de contentieux"},
+    {"champ":"Référence","contenu":"Scénario à politique inchangée et date de calcul"},
+    {"champ":"Profil","contenu":"Effet 2027, 2028, 2029 et régime de croisière"},
+    {"champ":"Rendement","contenu":"Brut, compensation, coût d'exécution et net"},
+    {"champ":"Confiance","contenu":"Fourchette basse, centrale, haute et probabilité"},
+    {"champ":"Comportements","contenu":"Hypothèses de recours, substitution, fraude ou emploi"},
+    {"champ":"Distribution","contenu":"Déciles, ménages, genre, âge, région, handicap"},
+    {"champ":"Interfédéral","contenu":"Transfert de coût et compensation entre entités"},
+    {"champ":"Croissance et climat","contenu":"Investissement, productivité, émissions, résilience"},
+    {"champ":"Suivi","contenu":"Indicateur, fréquence, propriétaire et clause corrective"}
+  ],
+  "scenarios": [
+    {"id":"A","titre":"Accord dominé par les dépenses et l'activation","composition":"Économies de fonctionnement, santé ciblée, chômage, longue maladie, rationalisation de subventions et de niches, faible part de nouveaux impôts.","benefice":"Compatible avec la ligne N-VA–MR et lisible pour les marchés.","risque":"Résistance de Vooruit et des Engagés, transferts vers les CPAS, effets sociaux, rendements emploi incertains, capacité administrative réduite.","signaux":"Objectifs par département, tickets modérateurs en santé, durcissement des contrôles, chiffres de non-remplacement des départs, compensation CPAS."},
+    {"id":"B","titre":"Compromis mixte avec recettes ciblées","composition":"Maîtrise des dépenses et réformes, réduction de dépenses fiscales, flexi-jobs et sociétés de management, contribution accrue sur certains patrimoines, compensations ciblées pour les bas revenus.","benefice":"Partage politique plus équilibré, mesures parfois plus rapides à encaisser.","risque":"Complexité, recettes comportementales, conflit MR–Vooruit, multiplication de petites taxes, coût des compensations.","signaux":"Base imposable plutôt que taux annoncé, rendement net après compensations, avis du Conseil d'État, calendrier de vote et moyens de contrôle."},
+    {"id":"C","titre":"Accord retardé ou paquet de sécurisation","composition":"Prolongation de mesures existantes, sous-utilisation de crédits, ventes d'actifs ou dividendes, montants non répartis et promesses de réformes ultérieures.","benefice":"Évite une rupture immédiate de la coalition.","risque":"Retard du dépôt, douzièmes provisoires, faible qualité structurelle, réaction de la Commission ou des agences de notation, nouvel effort au contrôle 2027.","signaux":"Absence de tableaux annuels, poids des mesures uniques, formulations « à déterminer », renvoi à des groupes de travail, faible traduction législative."}
+  ],
+  "questions_negociateurs": [
+    "Quel est le rendement net par année 2027, 2028 et 2029, pas seulement le cumul ?",
+    "Combien des 10 milliards correspond à de nouvelles mesures, à la sécurisation de montants existants et à des effets de retour ?",
+    "Quelle part est structurelle, temporaire ou unique ?",
+    "Les chiffres sont-ils mesurés selon le solde nominal, les dépenses nettes européennes ou la comptabilité budgétaire fédérale ?",
+    "Quel est l'impact sur l'Entité I, sur l'ensemble des administrations et sur les CPAS ?",
+    "Quelles lois et quels arrêtés sont nécessaires, à quelles dates ?",
+    "Quel organisme certifie le rendement et quelles marges d'incertitude applique-t-il ?",
+    "Quelles exemptions et compensations protègent les bas revenus, et quel est leur coût ?",
+    "Quel financement est prévu pour la défense après la fin de la flexibilité européenne en 2028 ?",
+    "Que devient la trajectoire de dette et d'intérêts si la croissance est inférieure de 0,5 point ou les taux supérieurs de 50 points de base ?",
+    "Les réductions d'effectifs incluent-elles le coût en recettes fiscales et sociales perdues ?",
+    "Où se trouve la note de genre exigée par la loi du 12 janvier 2007 ?",
+    "Quelle clause corrige automatiquement un rendement inférieur aux prévisions ?",
+    "Quand la Chambre et la Cour des comptes recevront-elles les tableaux complets ?"
+  ],
+  "themes": {
+    "cadrage":"Cadrage budgétaire",
+    "europe":"Gouvernance européenne",
+    "fiscalite":"Fiscalité",
+    "patrimoine":"Patrimoine et capital",
+    "recettes":"Recettes",
+    "depenses":"Dépenses",
+    "sante":"Santé",
+    "social":"Sécurité sociale",
+    "pensions":"Pensions",
+    "travail":"Marché du travail",
+    "emploi":"Emploi et activation",
+    "revenus":"Revenus et indexation",
+    "defense":"Défense",
+    "dette":"Dette et financement",
+    "justice":"Justice et fraude",
+    "climat":"Climat et énergie",
+    "enseignement":"Enseignement",
+    "interfederal":"Interfédéral",
+    "investissement":"Investissement et capacité",
+    "distribution":"Effets distributifs",
+    "gouvernance":"Gouvernance et exécution",
+    "methode":"Méthode"
+  },
+  "niveaux": {
+    "federal":"Fédéral",
+    "wallonie":"Région wallonne",
+    "fwb":"Fédération Wallonie-Bruxelles",
+    "europe":"Union européenne",
+    "interfederal":"Interfédéral"
+  }
+}
